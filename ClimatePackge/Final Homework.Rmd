@@ -1,0 +1,202 @@
+---
+title: "Assignment_packages"
+author: "Edaysi Bucio"
+date: "4 de junio de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library(devtools)
+library(roxygen2)
+
+```
+
+#Data
+Database source: https://climateknowledgeportal.worldbank.org/download-data 
+```{r}
+
+TempMX <- read_csv("temperatureMX.csv")
+PreciMX <- read_csv("precipitationMX.csv")
+
+use_data(TempMX, pkg = "ClimatePackage")
+
+
+```
+
+
+1. At least two different functions that summarize climate data in some way (your choice - it could be finding a trend, or finding extremes; or even simply mean winter precipitation)
+
+1.1 First function. I want to find the highest temperatures registered from 1901 to 2016 in Mexico. With this information I can look if there is a trend in warmer days increasing or decreasing over time. 
+
+```{r}
+
+#Data frame
+#TempMX_df <- TempMX 
+
+#Function
+Climate_average <- function(TempMX_df, plot = TRUE){
+    Hot_days <- TempMX_df %>%
+    group_by(Year) %>%
+    filter(Temperature == max(Temperature)) %>%
+    ungroup() 
+    if(plot == TRUE) {
+Hot_days_plot <- ggplot(TempMX_df, aes(x = Year, y = Temperature)) +
+    geom_point(size = 1.5) + 
+  ggtitle("Maximum Temperature in Celsius From Mexico 1901-2016") +
+  labs(y="Anually Maximum Temperature (degrees C)", x="Year")+
+  theme_classic() + 
+  geom_smooth(method="lm")
+    print(Hot_days_plot)
+    }
+    return(Hot_days)
+  } #First function that summarize climate trends
+
+(x <- Climate_average(TempMX_df = TempMX, plot = TRUE))
+
+
+```
+
+
+1.2. My second function will look at an average precipitation per year from 1901 to 2016 in Mexico. Afterwards, I can calculate a measure of impact between hot days and changes in precipitation and potential impacts on agriculture or water availability in the country. 
+
+```{r}
+
+#Data frame
+#PreciMX_df <- PreciMX
+
+#Function
+Rainfall_average <- function(PreciMX_df, plot = TRUE){
+  Precip_average <- PreciMX_df %>%
+    group_by(Year) %>%
+    summarise(Average = mean(Rainfall)) %>%
+    ungroup() 
+    if(plot == TRUE) {
+Rainfall_average_plot <- ggplot(PreciMX_df, aes(x = Year, y = Rainfall)) +
+    geom_point(size = 1.5) + 
+  ggtitle("Average Rainfall From Mexico 1901-2016") +
+  labs(y="Average Rainfall", x="Year")+
+  theme_classic() + 
+  geom_smooth(method="lm")
+  print(Rainfall_average_plot)
+    }
+  return(Precip_average) 
+  } #First function that summarize climate trends
+
+(r <-  Rainfall_average(PreciMX_df = PreciMX,  plot = TRUE)) 
+
+
+
+```
+
+
+
+2. At least two functions that calculate some measure of impact (you can really make these us) -so for example you could create a function that computes a heat stress index based on air temperature with parameters that vary with for different species; or a function that estimates water supply from precipitation with parameters that vary to reflect water storage .you can make something up just as long as its somewhat sensible.
+
+2.1. Measure of impact: I'm calculating species distribution according sea surface temperature. 
+
+```{r}
+
+#Assuming that the previous database have sea surface temperature (Temperature), I will identified El Niño years and potential impacts on marine species such as squid and tuna in the coast of California. Thus, I will create a function that computes ENSO index based on SST and impacts on different marine species. 
+
+Nino_impacts <- function(El_nino_df){
+    Hot_days <- El_nino_df %>%
+    group_by(Year) %>%
+    filter(Temperature == max(Temperature))
+      {
+y <- x %>%
+    select(Temperature)
+    }
+    
+yr=2019
+SST_changes_squid = 0.5 #Annual SST in celsius 
+
+while (SST_changes_squid < 25)   {
+SST_changes_squid = SST_changes_squid + 0.01* SST_changes_squid
+yr = yr + 1
+}
+
+SST_changes_sardine = 0.5 #Annual SST in celsius 
+while (SST_changes_sardine > 26)   {
+SST_changes_sardine = SST_changes_sardine + 0.01* SST_changes_sardine
+yr = yr + 1
+}
+
+Nino_impact_output <- list('Squid_impacts' = SST_changes_squid , 'sardine_impacts' = SST_changes_sardine)
+return(Nino_impact_output)
+} 
+
+(climate_impacts <- Nino_impacts(El_nino_df = TempMX)) 
+
+climate_impacts$Squid_impacts
+climate_impacts$sardine_impacts
+
+
+
+```
+
+2.2  Measure of impact: I will create a function that estimates water supply from precipitation with parameters that vary to reflect water storage. Those parameters are hot days and average precipitation
+
+```{r}
+
+
+Drought_impacts <- function(Drought_df){
+    Rainfall_changes <- Drought_df %>%
+    group_by(Year) %>%
+    filter(Temperature == max(Temperature))
+      
+y <- x %>%
+    select(Temperature)
+    }
+yr=2019
+Rainfall_change_temperature= 0.5 #Annual SST in celsius 
+
+while (Rainfall_change_temperature < 25)   {
+Rainfall_change_temperature = Rainfall_change_temperature + 0.01* Rainfall_change_temperature
+yr = yr + 1
+}
+ 
+Rainfall_change_temperature
+yr
+
+
+(Rainfall_changes <- Drought_impacts (Drought_df = TempMX)) #Why I'm getting weird numbers
+
+
+
+
+```
+
+3. One function that estimates the costs of impacts
+#Changes in squid and sardine abundance and availaility along the coast of California can have different economic impacts to the fishery industry. For example, during el Nino events, squid shits its distribution to Northern California. Market squid is one of the most important fisheries in Souther California, generating in average $70 billion dollarn exvessel price, therefore extreme abundance changes in the specie can impact the fishery industry in Southern California.
+
+#This function will determine economic looses of market squid distribution changes in the fishing industry under el Nino events. 
+```{r}
+
+Temperature_squid <- c(25, 24, 26, 27, 25, 23)
+Costs <- c(1, 0.5, 1.5, 2, 1, 0.3)
+
+costs_squid_df <- data.frame(Temperature_squid, Costs)
+
+Costs_function <- function(Market_Squid_costs){
+  Total_costs <-costs_squid_df %>%
+    filter(Temperature_squid == mean(Temperature_squid)) %>%
+    ungroup() 
+}
+
+(z <- Costs_function(Market_Squid_costs = costs_squid_df))
+
+#In average the cost of having a temperature of 25 celsius is 1 million dollars  
+
+
+
+```
+
+4. The package should contain: 
+- some sample data
+- documentation for ALL functions
+- a vignette that shows how to use several of the functions with the sample data
+- 3 separate tests - (next weeks lecture)

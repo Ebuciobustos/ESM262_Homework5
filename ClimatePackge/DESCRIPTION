@@ -1,0 +1,10 @@
+Package: ClimatePackge
+Type: Package
+Title: CLimatePackage
+Version: 0.1.0
+Author: Edaysi Bucio
+Maintainer: The package maintainer <yourself@somewhere.net>
+Description: Package that calculates climate trends, precipitation averages, and climate impacts on market squid and sardine
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true

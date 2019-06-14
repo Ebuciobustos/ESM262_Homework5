@@ -1,0 +1,53 @@
+---
+title: "using_climate_package"
+author: "Edaysi Bucio"
+date: "13 de junio de 2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using_climate_package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidyverse)
+library(ClimatePackge)
+
+```
+
+Lets read in data and then calculate some summary information
+
+```{r example}
+
+#get data (you could load your own here)
+
+save(TempMX, file = "TempMX.rda")
+load("TempMX.rds")
+TempMX
+
+save(PreciMX, file = "PReciMX.rda")
+load("PreciMX.rda")
+PreciMX
+
+# output summary
+Hot_years <- Warmer_years(TempMX_df = TempMX, plot = TRUE)
+
+# Average precipitation table
+Precipitation_av <- Precipitation_average(PreciMX_df = PreciMX,  plot = TRUE)
+
+# El Nino impacts
+climate_impacts <- Nino_impacts(El_nino_df = TempMX)
+
+# Drought year
+Rainfall_changes <- Drought_impacts (Drought_df = TempMX)
+
+#Costs function
+z <- Costs_function(Market_Squid_costs = costs_squid_df)
+
+
+```
+
